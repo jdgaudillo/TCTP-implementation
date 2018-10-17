@@ -40,3 +40,5 @@ elif transformation_mode == 2:
 	T2_data = PTEquivalence(input_data)
 else:
 	T3_data = zOrder(input_data) 
+
+print('hello')
