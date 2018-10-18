@@ -42,4 +42,4 @@ else:
 	T3_data = zOrder(input_data) 
 
 print('hello')
->>>>>>> 9132cad20d426814755b5b6278f7138a41bafbc8
+

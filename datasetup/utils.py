@@ -1,16 +1,19 @@
 import pandas as pd
 import numpy as np
 
-def openFile(data_filename):
+def checkFileType(filename):
+
+
+def openFile(filename):
+
+
+def validate(data):
+	
+
+def addID(data):
 
 
 def dropCols(data, features):
-
-
-def addFlag(data):
-
-
-def clusterDataframe(cluster_dict, cluster_number):
 
 
 def toCSV():

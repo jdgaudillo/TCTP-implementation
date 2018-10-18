@@ -3,10 +3,18 @@ import numpy as np
 
 from utils import *
 
-def cleanData(data):
+def clean(filename):
+	checkFileType(filename)
+	data = openFile(filename)
+	data = dropCols(data, features = ('PR', 'GROUP', 'YEAR'))
+	validate(data)
 
+	data = addId(data)
+	data = dropCols(data, features = ('NAME', 'YEAR'))
 
-def filterPAR(data, filter_mode):
+	'''
+		Script to ensure the output follows the listed expected behavior of the function
 
+	'''
 
-def normalize(data):
+	toCSV(data)
