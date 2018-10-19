@@ -2,18 +2,17 @@ import warnings
 warnings.filterwarnings('ignore')
 
 from datasetup.data_preprocessing import *
-from datasetup.data_segmentation import *
-from datasetup.data_transformation import *
+#from datasetup.data_segmentation import *
+#from datasetup.data_transformation import *
 
 
 data_filename = 'imported/Full_Dataset.txt'
 
-data = openFile(filename)
 
-data = cleanData(data)
+data = clean(data_filename)
 
 
-filter_mode = # ORIGIN or ENDPOINT
+"""filter_mode = # ORIGIN or ENDPOINT
 filtered_data = filterPAR(data, filter_mode = filter_mode)
 
 normalized_data = normalized(filtered_data)
@@ -41,5 +40,5 @@ elif transformation_mode == 2:
 else:
 	T3_data = zOrder(input_data) 
 
-print('hello')
+print('hello')"""
 
