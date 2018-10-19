@@ -17,10 +17,13 @@ def checkFileType(filename):
 
 def openFile(filename):
 	filetype = filename.split('.')[1]
-	csv_txt = ('csv', 'txt')
+	txt = 'txt'
+	csv = 'csv'
 
-	if filetype in csv_txt:
+	if filetype == txt:
 		data = pd.read_csv(filename, sep = '\t', na_values = ['-'])
+	elif filetype == csv:
+		data = pd.read_csv(filename, sep = ',', na_values = ['-'])
 	else:
 		data = pd.read_excel(filename)
 
