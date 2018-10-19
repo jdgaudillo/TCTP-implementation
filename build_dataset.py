@@ -9,10 +9,11 @@ from datasetup.data_preprocessing import *
 data_filename = 'imported/Full_Dataset.txt'
 cleaned_data_filename = 'exported/Cleaned_Dataset.csv'
 
+normalize(cleaned_data_filename)
 
-data = clean(data_filename)
+#data = clean(data_filename)
 
-filterPAR(cleaned_data_filename)
+#filterPAR(cleaned_data_filename)
 
 """filter_mode = # ORIGIN or ENDPOINT
 filtered_data = filterPAR(data, filter_mode = filter_mode)
