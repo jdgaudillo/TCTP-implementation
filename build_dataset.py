@@ -7,10 +7,12 @@ from datasetup.data_preprocessing import *
 
 
 data_filename = 'imported/Full_Dataset.txt'
+cleaned_data_filename = 'exported/Cleaned_Dataset.csv'
 
 
 data = clean(data_filename)
 
+filterPAR(cleaned_data_filename)
 
 """filter_mode = # ORIGIN or ENDPOINT
 filtered_data = filterPAR(data, filter_mode = filter_mode)
