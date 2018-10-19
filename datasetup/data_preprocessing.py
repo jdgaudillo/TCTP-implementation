@@ -68,5 +68,28 @@ def filterPAR(filename):
 	mode = 'ENDPOINT'
 	filtered_data = getPoints(data, TCID_par, mode)
 	
-	outfile = 'exported/' + mode + '_Data.csv'
+	outfile = 'exported/' + mode + '_Dataset.csv'
 	toCSV(filtered_data, outfile)
+
+def normalize(filename):
+	checkFileType(filename)
+	data = openFile(filename)
+
+	TCIDs = data['TCID'].values
+	origin_array = data.loc[data['ADV'] == '1', ['LATITUDE', 'LONGITUDE']].values
+	
+	
+	origin_dict = dict(zip(TCIDs, origin_array))
+
+	for TCID, origin in origin_dict.items():
+		latitude = data.loc[data['TCID'] == TCID, 'LATITUDE'].values
+		longitude = data.loc[data['TCID'] == TCID, 'LONGITUDE'].values
+		
+		norm_lat = [np.round(lat-origin[0], 2) for lat in latitude]
+		norm_long = [np.round(lon - origin[1], 2) for lon in longitude]
+
+		data.loc[data['TCID'] == TCID, 'NORMALIZED_LATITUDE'] = norm_lat
+		data.loc[data['TCID'] == TCID, 'NORMALIZED_LONGITUDE'] = norm_long
+	
+	out_file = 'exported/' + 'Normalized_Dataset.csv'
+	toCSV(data, out_file)
