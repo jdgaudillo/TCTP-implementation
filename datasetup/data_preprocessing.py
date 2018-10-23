@@ -10,11 +10,11 @@ from datasetup.utils import *
 def clean(filename):
 	checkFileType(filename)
 	data = openFile(filename)
-	data = dropCols(data, features = ['UNNAMED: 0', 'PR', 'GROUP', 'GEOMETRY'])
+	#data = dropCols(data, features = ['UNNAMED: 0', 'PR', 'GROUP', 'GEOMETRY'])
 	validate(data)
 
-	data = addID(data)
-	data = dropCols(data, features = ['NAME', 'YEAR', 'TIME'])
+	#data = addID(data)
+	#data = dropCols(data, features = ['NAME', 'YEAR'])
 	
 	print(data.shape)
 
@@ -28,10 +28,13 @@ def clean(filename):
 
 	status = data['STAT'].values
 	status = [stat.replace(' ', '') for stat in status]
-	print(data['STAT'].unique())
 
-	out_file = 'exported/Cleaned_Dataset.csv'
-	toCSV(data, out_file)
+	print('Successfully cleaned file')
+	
+	return data
+
+	#out_file = 'exported/Cleaned_Dataset.csv'
+	#toCSV(data, out_file)
 
 def getPoints(data, TCID_par, mode):
 	if mode == 'ORIGIN':
@@ -47,10 +50,7 @@ def getPoints(data, TCID_par, mode):
 	return data
 
 
-def filterPAR(filename):
-	checkFileType(filename)
-	data = openFile(filename)
-
+def filterPAR(data, filter_mode):
 	TCID_par = []
 	par_poly = geometry.Polygon([(120, 25), (135, 25), (135, 5), (115, 5), (115, 15), (120, 21), (120, 25)])
 	start_time = time.time()
@@ -62,14 +62,16 @@ def filterPAR(filename):
 			TCID_par.append(TCID)
 					
 	print("Run Time: %s seconds" % (time.time() - start_time))
-
 	data = data.loc[data['TCID'].isin(TCID_par)].reset_index(drop=True)
+	print('Successfully filtered data that passed through PAR')
 
-	mode = 'ENDPOINT'
-	filtered_data = getPoints(data, TCID_par, mode)
+	filtered_data = getPoints(data, TCID_par, filter_mode)
+	filtered_data = filtered_data.drop('Unnamed: 0', axis=1)
+	print('Successfully extracted', filter_mode)
+	return filtered_data
 	
-	outfile = 'exported/' + mode + '_Dataset.csv'
-	toCSV(filtered_data, outfile)
+	##outfile = 'exported/' + mode + '_Dataset.csv'
+	#toCSV(filtered_data, outfile)
 
 def normalize(filename):
 	checkFileType(filename)
