@@ -2,14 +2,30 @@ import warnings
 warnings.filterwarnings('ignore')
 
 from datasetup.data_preprocessing import *
-#from datasetup.data_segmentation import *
-#from datasetup.data_transformation import *
-
 
 data_filename = 'imported/Full_Dataset.txt'
-cleaned_data_filename = 'exported/Cleaned_Dataset.csv'
 
-normalize(cleaned_data_filename)
+
+data = clean(data_filename)
+
+filter_mode = 0
+if filter_mode == 0: 
+	data = filterPAR(data, 'ORIGIN')
+else:
+	data = filterPAR(data, 'ENDPOINT')
+
+segmentation_mode = # 0: kmeans, 1: hierarchicalclustering, 2: DBSCAN
+
+if segmentation_mode == 0:
+	cluster_dict = kmeans(normalized_data, features = features)
+elif segmentation_mode == 1:
+	cluster_dict = hierarchicalCLustering(normalized_data, features = features)
+else:
+	cluster_dict = DBSCAN(normalized_data, features = features)
+
+
+
+
 
 #data = clean(data_filename)
 
