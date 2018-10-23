@@ -3,8 +3,7 @@ warnings.filterwarnings('ignore')
 
 from datasetup.data_preprocessing import *
 
-data_filename = 'imported/Full_Dataset.txt'
-
+data_filename = 'exported/Consistent_Time_Interval_Dataset.csv'
 
 data = clean(data_filename)
 
@@ -14,14 +13,16 @@ if filter_mode == 0:
 else:
 	data = filterPAR(data, 'ENDPOINT')
 
-segmentation_mode = # 0: kmeans, 1: hierarchicalclustering, 2: DBSCAN
+
+
+"""segmentation_mode = # 0: kmeans, 1: hierarchicalclustering, 2: DBSCAN
 
 if segmentation_mode == 0:
 	cluster_dict = kmeans(normalized_data, features = features)
 elif segmentation_mode == 1:
 	cluster_dict = hierarchicalCLustering(normalized_data, features = features)
 else:
-	cluster_dict = DBSCAN(normalized_data, features = features)
+	cluster_dict = DBSCAN(normalized_data, features = features)"""
 
 
 

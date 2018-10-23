@@ -58,7 +58,7 @@ def addID(data):
 
 def dropCols(data, features):
 	data.rename(columns = lambda x: x.upper(), inplace=True)
-	data = data.drop(features, axis = 1)
+	data = data.drop(features, axis=1)
 
 	return data
 
