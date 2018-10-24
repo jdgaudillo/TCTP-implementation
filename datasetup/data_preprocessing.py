@@ -35,9 +35,9 @@ def clean(filename):
 
 def getPoints(data, mode):
 	start_time = time.time()
-	TCID = data.TCID.unique.values
+	TCID = data.TCID.unique()
 	if mode == 'ORIGIN':
-		data = data.drop(data[data['ADV'] != '1'].index)
+		data = data.drop(data[data['ADV'] != 1].index)
 	elif mode == 'ENDPOINT':
 		TCID_len = len(TCID) 
 		for TC in TCID:
@@ -68,7 +68,7 @@ def filterPAR(data):
 
 	data = data.loc[data['TCID'].isin(TCID_par)].reset_index(drop=True)
 
-	print('Successfully filtered data that passed through PAR')
+	print('Successfully filtered data that passed through PAR \n')
 
 	return data
 
@@ -94,3 +94,37 @@ def normalize(filename):
 	
 	out_file = 'exported/' + 'Normalized_Dataset.csv'
 	toCSV(data, out_file)
+
+def checkTimeConsistency(data):
+	times = data['TIME'].values
+	times = [t.split('/')[2] for t in times]
+	times = [re.sub('[a-zA-z]$', '', t) for t in times]
+
+	data.loc[:, 'TIME_INTERVAL'] = times
+
+	TCID = data['TCID'].unique()
+	counter = 0
+	print(len(data['TCID'].unique()))
+
+	for TC in TCID:
+		time_interval = data.loc[data['TCID'] == TC, 'TIME_INTERVAL'].values
+		time_interval = time_interval.astype(float)
+		origin = time_interval[0]
+		temp = origin
+		
+		for t in time_interval:
+			flag = 0
+			if temp > 23.:
+				temp = 0.
+			if t != temp:
+				flag = 1
+				break
+
+			temp = temp + 6
+
+		if flag == 1:
+			print(flag, TC)
+			data = data.drop(data[data['TCID'] == TC].index)
+
+
+	data.to_csv('imported/Full_Dataset.csv', index=False)
