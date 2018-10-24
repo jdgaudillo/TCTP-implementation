@@ -1,6 +1,7 @@
 import pandas as pd
 import numpy as np
 import sys
+import time
 
 def checkFileType(filename):
 	filetypes = ('.csv', '.txt', '.xlsx')
@@ -12,10 +13,11 @@ def checkFileType(filename):
 	if success == 0:
 		sys.exit('ERROR: Improper file format!')
 
-	print('Correct file format!')
+	print('Correct file format!\n')
 
 
 def openFile(filename):
+	start_time = time.time()
 	filetype = filename.split('.')[1]
 	txt = 'txt'
 	csv = 'csv'
@@ -26,6 +28,9 @@ def openFile(filename):
 		data = pd.read_csv(filename, sep = ',', na_values = ['-'])
 	else:
 		data = pd.read_excel(filename)
+
+	print('Run Time: %s seconds' % (time.time() - start_time))
+	print('Successfully opened ', filename, '\n')
 
 	return data
 

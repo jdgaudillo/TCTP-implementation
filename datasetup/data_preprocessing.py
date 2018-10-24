@@ -33,24 +33,27 @@ def clean(filename):
 	
 	return data
 
-	#out_file = 'exported/Cleaned_Dataset.csv'
-	#toCSV(data, out_file)
-
-def getPoints(data, TCID_par, mode):
+def getPoints(data, mode):
+	start_time = time.time()
+	TCID = data.TCID.unique.values
 	if mode == 'ORIGIN':
 		data = data.drop(data[data['ADV'] != '1'].index)
 	elif mode == 'ENDPOINT':
-		TCID_len = len(TCID_par) 
-		for TCID in TCID_par:
-			duration = len(data.loc[data['TCID'] == TCID])
+		TCID_len = len(TCID) 
+		for TC in TCID:
+			duration = len(data.loc[data['TCID'] == TC])
 			endpoint_index = duration - 1
 			endpoint = data.iloc[[endpoint_index]]
-			data = data.drop(data[data['TCID'] == TCID].index)
+			data = data.drop(data[data['TCID'] == TC].index)
 			data = pd.concat([data, endpoint])
+
+	print('Run Time: %s seconds' % (time.time() - start_time))
+	print('Successfully extracted', mode, 'points')
+
 	return data
 
 
-def filterPAR(data, filter_mode):
+def filterPAR(data):
 	TCID_par = []
 	par_poly = geometry.Polygon([(120, 25), (135, 25), (135, 5), (115, 5), (115, 15), (120, 21), (120, 25)])
 	start_time = time.time()
@@ -62,16 +65,12 @@ def filterPAR(data, filter_mode):
 			TCID_par.append(TCID)
 					
 	print("Run Time: %s seconds" % (time.time() - start_time))
+
 	data = data.loc[data['TCID'].isin(TCID_par)].reset_index(drop=True)
+
 	print('Successfully filtered data that passed through PAR')
 
-	filtered_data = getPoints(data, TCID_par, filter_mode)
-	filtered_data = filtered_data.drop('Unnamed: 0', axis=1)
-	print('Successfully extracted', filter_mode)
-	return filtered_data
-	
-	##outfile = 'exported/' + mode + '_Dataset.csv'
-	#toCSV(filtered_data, outfile)
+	return data
 
 def normalize(filename):
 	checkFileType(filename)
