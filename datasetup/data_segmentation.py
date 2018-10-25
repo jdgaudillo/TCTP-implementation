@@ -1,10 +1,14 @@
-import pandas as pd 
+import warnings
+import matplotlib as mpl
+import pandas as pd
 import numpy as np
 from sklearn.cluster import KMeans
 from sklearn import metrics
 from scipy.spatial.distance import cdist
-from matplotlib import pyplot as plt
+import matplotlib.pyplot as plt
 
+warnings.filterwarnings('ignore')
+mpl.use('Tkagg')
 # from utils import *
 
 
@@ -34,7 +38,7 @@ def DBSCAN(data, features):
 def silhouette_analysis(data):  # input pandas ORIGIN DataFrame, output plot
     data = data[['LATITUDE', 'LONGITUDE']]
     sil_list = []
-    k = range(2, 10)
+    k = range(2, 50)
     for i in k:
         k_means = KMeans(n_clusters = i)
         k_means.fit(data)
@@ -44,6 +48,7 @@ def silhouette_analysis(data):  # input pandas ORIGIN DataFrame, output plot
         sil_list.append(metrics.silhouette_score(data, labels, metric = 'euclidean'))
 
     # plotting for analysis
+    plt.figure()
     plt.plot(k, sil_list, 'bx-')
     plt.xlabel('Number of Centroids')
     plt.ylabel('Silhouette Score')
