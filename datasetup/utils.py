@@ -4,6 +4,18 @@ import sys
 import time
 
 def checkFileType(filename):
+	""" Checks if input filename has correct filetype (e.g. csv, txt, xlsx)
+
+	Parameters
+	-----------
+	filename: str
+		The filename of the dataset
+
+	Returns
+	-----------
+		[Stops the execution of the code if input file type is incorrect]
+	"""
+
 	filetypes = ('.csv', '.txt', '.xlsx')
 	success = 0
 
@@ -16,7 +28,22 @@ def checkFileType(filename):
 	print('Correct file format!\n')
 
 
+
 def openFile(filename):
+	""" Opens input file and store content to dataframe
+
+	Parameters
+	-----------
+	filename: str
+		The filename of the dataset
+
+	Returns
+	-----------
+	data: dataframe
+		A dataframe containing the contents of the input file
+
+	"""
+
 	start_time = time.time()
 	filetype = filename.split('.')[1]
 	txt = 'txt'
@@ -35,7 +62,19 @@ def openFile(filename):
 	return data
 
 
+
 def validate(data):
+	""" Validates data content
+
+	Parameters
+	-----------
+	data: dataframe
+		The dataframe which contains the content of the input file
+
+	Returns
+	-----------
+	"""
+
 	dtype_float = ['float', 'ADV', 'LATITUDE', 'LONGITUDE', 'WIND']
 
 
@@ -45,6 +84,20 @@ def validate(data):
 	
 
 def addID(data):
+	""" Adds ID field to the dataframe
+
+	Parameters
+	-----------
+	data: dataframe
+		The dataframe which contains the content of the input file
+
+	Returns
+	-----------
+	data: dataframe
+		Dataframe with TCID field
+
+	"""
+
 	names = data['NAME'].values
 	names = [name.replace(' ', '') for name in names]
 
@@ -61,13 +114,41 @@ def addID(data):
 	return data
 
 
+
 def dropCols(data, features):
+	""" Drops columns indicated by the features
+
+	Parameters
+	-----------
+	data: dataframe
+		The dataframe which contains the content of the input file
+	features: array
+		Array of features to drop
+
+	Returns
+	-----------
+	data: dataframe
+	"""
+
 	data.rename(columns = lambda x: x.upper(), inplace=True)
 	data = data.drop(features, axis=1)
 
 	return data
 
 
+
 def toCSV(data, out_file):
+	""" Saves dataframe to csv file
+
+	Parameters
+	-----------
+	data: dataframe
+		The dataframe which contains the content of the input file
+	outfile: str
+		Output filename
+
+	Returns
+	-----------
+	"""
 	data.to_csv(out_file, index = False)
 

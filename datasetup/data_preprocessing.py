@@ -8,13 +8,23 @@ import time
 from datasetup.utils import *
 
 def clean(filename):
+	""" Cleans dataset
+
+	Parameters
+	-----------
+	filename: str
+		The input file name
+
+	Returns
+	-----------
+	data: dataframe
+		Cleaned data
+	"""
+
 	checkFileType(filename)
 	data = openFile(filename)
-	#data = dropCols(data, features = ['UNNAMED: 0', 'PR', 'GROUP', 'GEOMETRY'])
 	validate(data)
 
-	#data = addID(data)
-	#data = dropCols(data, features = ['NAME', 'YEAR'])
 	
 	print(data.shape)
 
@@ -33,7 +43,58 @@ def clean(filename):
 	
 	return data
 
+
+
+def filterPAR(data):
+	""" Filters data points that passed through PAR
+
+	Parameters
+	-----------
+	data: dataframe
+		The dataframe which contains the data
+
+	Returns
+	-----------
+	data: dataframe
+		Dataframe which only contains data points that passed through PAR
+	"""
+
+	TCID_par = []
+	par_poly = geometry.Polygon([(120, 25), (135, 25), (135, 5), (115, 5), (115, 15), (120, 21), (120, 25)])
+	start_time = time.time()
+
+	for TCID, val in data.groupby('TCID', sort=False):
+		trajectory = geometry.MultiPoint(val[['LONGITUDE', 'LATITUDE']].values)
+						
+		if trajectory.intersects(par_poly):
+			TCID_par.append(TCID)
+					
+	print("Run Time: %s seconds" % (time.time() - start_time))
+
+	data = data.loc[data['TCID'].isin(TCID_par)].reset_index(drop=True)
+
+	print('Successfully filtered data that passed through PAR \n')
+
+	return data
+
+
+
 def getPoints(data, mode):
+	""" Get points based on mode
+
+	Parameters
+	-----------
+	data: dataframe
+		The dataframe which contains the data
+	mode: str
+		Basis of point extraction (if ORIGIN/ENDPOINT)
+
+	Returns
+	-----------
+	data: dataframe
+		Dataframe which only contains points based on specified mode
+	"""
+
 	start_time = time.time()
 	TCID = data.TCID.unique()
 	if mode == 'ORIGIN':
@@ -53,28 +114,20 @@ def getPoints(data, mode):
 	return data
 
 
-def filterPAR(data):
-	TCID_par = []
-	par_poly = geometry.Polygon([(120, 25), (135, 25), (135, 5), (115, 5), (115, 15), (120, 21), (120, 25)])
-	start_time = time.time()
 
-	for TCID, val in data.groupby('TCID', sort=False):
-		trajectory = geometry.MultiPoint(val[['LONGITUDE', 'LATITUDE']].values)
-						
-		if trajectory.intersects(par_poly):
-			TCID_par.append(TCID)
-					
-	print("Run Time: %s seconds" % (time.time() - start_time))
+def normalize(data):
+	""" Normalizes latitude and longitude data points
 
-	data = data.loc[data['TCID'].isin(TCID_par)].reset_index(drop=True)
+	Parameters
+	-----------
+	data: dataframe
+		The dataframe which contains the data
 
-	print('Successfully filtered data that passed through PAR \n')
-
-	return data
-
-def normalize(filename):
-	checkFileType(filename)
-	data = openFile(filename)
+	Returns
+	-----------
+	data: dataframe
+		Dataframe which contains NORMALIZED_LAT and NORMALIZED_LONG fields
+	"""
 
 	TCIDs = data['TCID'].values
 	origin_array = data.loc[data['ADV'] == '1', ['LATITUDE', 'LONGITUDE']].values
@@ -92,10 +145,22 @@ def normalize(filename):
 		data.loc[data['TCID'] == TCID, 'NORMALIZED_LATITUDE'] = norm_lat
 		data.loc[data['TCID'] == TCID, 'NORMALIZED_LONGITUDE'] = norm_long
 	
-	out_file = 'exported/' + 'Normalized_Dataset.csv'
-	toCSV(data, out_file)
+	return data
+
+	
 
 def checkTimeConsistency(data):
+	""" Checks if time step follows 6-hr interval
+
+	Parameters
+	-----------
+	data: dataframe
+		The dataframe which contains the data
+
+	Returns
+	-----------
+	"""
+
 	times = data['TIME'].values
 	times = [t.split('/')[2] for t in times]
 	times = [re.sub('[a-zA-z]$', '', t) for t in times]

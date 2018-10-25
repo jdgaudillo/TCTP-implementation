@@ -6,15 +6,62 @@ import matplotlib.pylab as plt
 
 
 def componentMethod(data):
-    return
+    """ Separates latitude and longitude
+
+    Parameters
+    -----------
+    data: dataframe
+        The dataframe which contains the data
+
+    Returns
+    -----------
+    lat_data: dataframe
+    long_data: dataframe
+        Dataframe that only contains longitude or latitude data points
+
+    """
+    data = data.set_index('TCID')
+    lat_data = data[['LATITUDE']]
+    long_data = data[['LONGITUDE']]
+	
+    return lat_data, long_data
 
 
-def PTEquivalence(data):  # input dataset, output: ONE dataset with index = TCID and 2 columns latitude, and longitude
-    out = data[['LONGITUDE', 'LATITUDE']].set_index('TCID')
-    return out
+
+def PTEquivalence(data):
+    """ Transforms data into point-time equivalence
+
+    Parameters
+    -----------
+    data: dataframe
+        The dataframe which contains the data
+
+    Returns
+    -----------
+    data: dataframe
+        Dataframe that only contains latitude and longitude data points
+    """
+
+    data = data[['LONGITUDE', 'LATITUDE']].set_index('TCID')
+    return data
 
 
-def zTransform(data, bit):  # input: dataset and desired bit, output: ONE dataset where index = TCID, and 1 column, Z
+
+def zTransform(data, bit):
+    """ Transforms data into z-order value
+
+    Parameters
+    -----------
+    data: dataframe
+        The dataframe which contains the data
+    bit: int
+        The number of unique bit
+
+    Returns
+    -----------
+    data: dataframe
+        Dataframe with Z-order field only
+    """
 
     lon_max = data['LONGITUDE'].max()
     lat_max = data['LATITUDE'].max()
@@ -57,8 +104,9 @@ def zTransform(data, bit):  # input: dataset and desired bit, output: ONE datase
     return out
 
 
-# used to determine the optimal number of bit to be used in the Z-Transform
+
 def bitDetermination(data):  # input dataset, output plot
+
     lon_max = data['LONGITUDE'].max()
     lat_max = data['LATITUDE'].max()
 
@@ -110,3 +158,20 @@ def bitDetermination(data):  # input dataset, output plot
     plt.ylabel('Number of Unique Z')
     plt.title('NUmber of Unique Z vs Bit Number')
     return
+
+def zOrderCrossTabulation(data):
+    """ Cross tabulates the data
+
+    Parameters
+    -----------
+    data: dataframe
+        The dataframe which contains the data
+
+    Returns
+    -----------
+    data: dataframe
+        Cross tabulated dataframe
+    """	
+	input_data = pd.crosstab(data.index, data.Z)
+
+	return input_data

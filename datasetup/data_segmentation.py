@@ -12,18 +12,30 @@ mpl.use('Tkagg')
 # from utils import *
 
 
-def kmeans(data, centroids):  # input pandas ORIGIN DataFrame, output additional row in original data set
+def kmeans(data, centroids): 
+    """ Performs kMeans clustering
+
+    Parameters
+    -----------
+    data: dataframe
+        The dataframe which contains the data
+    centroids: int
+        Number of centroids 
+
+    Returns
+    -----------
+    data: dataframe
+        Dataframe which contains K-Means Labels (cluster label of each tropical cyclone)
+    """
+
     df = data[['TCID', 'LATITUDE', 'LONGITUDE']].set_index('TCID')
     k_means = KMeans(n_clusters = centroids)
     k_means.fit(df)
 
-    # centroids = k_means.cluster_centers_
     labels = k_means.labels_
 
-    # print(centroids)
-    # print(labels)
-
     data['K-Means Labels'] = labels
+
     return data
 
 
@@ -35,7 +47,20 @@ def DBSCAN(data, features):
     return
 
 
-def silhouette_analysis(data):  # input pandas ORIGIN DataFrame, output plot
+def silhouette_analysis(data):
+    """ Performs silhouette analysis
+
+    Parameters
+    -----------
+    data: dataframe
+        The dataframe which contains the data
+
+    Returns
+    -----------
+    plot: png
+        Silhouette Analysis plot
+    """
+
     data = data[['LATITUDE', 'LONGITUDE']]
     sil_list = []
     k = range(2, 50)
@@ -47,19 +72,30 @@ def silhouette_analysis(data):  # input pandas ORIGIN DataFrame, output plot
 
         sil_list.append(metrics.silhouette_score(data, labels, metric = 'euclidean'))
 
-    # plotting for analysis
     plt.figure()
     plt.plot(k, sil_list, 'bx-')
     plt.xlabel('Number of Centroids')
     plt.ylabel('Silhouette Score')
     outfile = 'exported/Silhouette_Analysis_Plot_1/0.jpg'
-    plt.savefig('exported/plots/Silhouette_Analysis_Plot_filter.png')
+    plt.savefig('exported/plots/Silhouette_Analysis_Plot_filter_ztransformed.png')
     plt.close()
     return
 
 
-def elbow_plot_analysis(data):
-    data = data[['LATITUDE', 'LONGITUDE']]
+def elbowPlotAnalysis(data):
+    """ Performs elbow curve analysis
+
+    Parameters
+    -----------
+    data: dataframe
+        The dataframe which contains the data
+
+    Returns
+    -----------
+    plot: png
+        Elbow curve analysis plot
+    """
+
     distortions = []
     k = range(1, 101)
     for i in k:
@@ -71,6 +107,5 @@ def elbow_plot_analysis(data):
     plt.xlabel('Number of Centroids')
     plt.ylabel('Distortion')
     plt.title('The Elbow Method showing the optimal Number of Centroids')
-    plt.show()
-
-    return
+    plt.savefig('exported/plots/Elbow_Plot_Analysis_filter_ztransformed.png')
+    plt.close()
