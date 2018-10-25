@@ -1,5 +1,7 @@
 import warnings
 import matplotlib as mpl
+from sklearn.cluster import MeanShift
+from sklearn.cluster import DBSCAN
 import pandas as pd
 import numpy as np
 from sklearn.cluster import KMeans
@@ -36,15 +38,28 @@ def kmeans(data, centroids):
 
     data['K-Means Labels'] = labels
 
+    # print(centroids)
+    # print(labels)
+
+    data['K-Means Label'] = labels
     return data
 
 
-def hierarchicalclustering(data, features):
-    return
+def hierarchicalClustering(data):
+    copy = data[['LATITUDE', 'LONGITUDE', 'TCID']].set_index('TCID')
+    ms = MeanShift()
+    ms.fit(copy)
+    lbs = ms.labels_
+    data['Hierarchical Clustering Label'] = lbs
+    return data
 
 
-def DBSCAN(data, features):
-    return
+def DBSCANClustering(data):
+    copy = data[['LATITUDE', 'LONGITUDE', 'TCID']].set_index('TCID')
+    db = DBSCAN(eps = 0.3).fit(copy)
+    labels = db.labels_
+    data['DBSCAN Labels'] = labels
+    return data
 
 
 def silhouette_analysis(data):
