@@ -23,10 +23,12 @@ def kmeans(data, centroids):  # input pandas ORIGIN DataFrame, output additional
     return data
 
 
-def hierarchicalClustering(data, features):
+def hierarchicalclustering(data, features):
+    return
 
 
 def DBSCAN(data, features):
+    return
 
 
 def silhouette_analysis(data):  # input pandas ORIGIN DataFrame, output plot
@@ -45,7 +47,9 @@ def silhouette_analysis(data):  # input pandas ORIGIN DataFrame, output plot
     plt.plot(k, sil_list, 'bx-')
     plt.xlabel('Number of Centroids')
     plt.ylabel('Silhouette Score')
-    plt.show()
+    outfile = 'exported/Silhouette_Analysis_Plot_1/0.jpg'
+    plt.savefig('exported/plots/Silhouette_Analysis_Plot_filter.png')
+    plt.close()
     return
 
 
