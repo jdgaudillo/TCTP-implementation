@@ -22,9 +22,8 @@ def componentMethod(data):
     data = data.set_index('TCID')
     lat_data = data[['LATITUDE']]
     long_data = data[['LONGITUDE']]
-	
-    return lat_data, long_data
 
+    return lat_data, long_data
 
 
 def PTEquivalence(data):
@@ -127,6 +126,7 @@ def zTransform(data):
     out = data[['Z', 'TCID']].set_index('TCID')
 
     return out
+
 
 def zOrderCrossTabulation(data):
     data = pd.crosstab(data.index, data.Z)

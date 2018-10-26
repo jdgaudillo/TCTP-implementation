@@ -1,4 +1,4 @@
-import pandas as pd 
+import pandas as pd
 import numpy as np
 import re
 
@@ -7,189 +7,185 @@ import time
 
 from datasetup.utils import *
 
+
 def clean(filename):
-	""" Cleans dataset
+    """ Cleans dataset
 
-	Parameters
-	-----------
-	filename: str
-		The input file name
+    Parameters
+    -----------
+    filename: str
+        The input file name
 
-	Returns
-	-----------
-	data: dataframe
-		Cleaned data
-	"""
+    Returns
+    -----------
+    data: dataframe
+        Cleaned data
+    """
 
-	checkFileType(filename)
-	data = openFile(filename)
-	validate(data)
+    checkFileType(filename)
+    data = openFile(filename)
+    validate(data)
 
-	
-	print(data.shape)
+    print(data.shape)
 
-	time_steps = data['ADV'].values
-	regx = re.compile(r'[a-zA-z]$')
-	time_steps = [re.sub(regx, '', str(time_step)) for time_step in time_steps]
-	data.loc[:, 'ADV'] = time_steps
+    time_steps = data['ADV'].values
+    regx = re.compile(r'[a-zA-z]$')
+    time_steps = [re.sub(regx, '', str(time_step)) for time_step in time_steps]
+    data.loc[:, 'ADV'] = time_steps
 
-	TCID = data['TCID'].unique()
-	data = data.groupby('TCID', sort=False, group_keys=False).apply(lambda x: x.drop_duplicates('ADV', keep='last'))
+    TCID = data['TCID'].unique()
+    data = data.groupby('TCID', sort = False, group_keys = False).apply(
+        lambda x: x.drop_duplicates('ADV', keep = 'last'))
 
-	status = data['STAT'].values
-	status = [stat.replace(' ', '') for stat in status]
+    status = data['STAT'].values
+    status = [stat.replace(' ', '') for stat in status]
 
-	print('Successfully cleaned file')
-	
-	return data
+    print('Successfully cleaned file')
 
+    return data
 
 
 def filterPAR(data):
-	""" Filters data points that passed through PAR
+    """ Filters data points that passed through PAR
 
-	Parameters
-	-----------
-	data: dataframe
-		The dataframe which contains the data
+    Parameters
+    -----------
+    data: dataframe
+        The dataframe which contains the data
 
-	Returns
-	-----------
-	data: dataframe
-		Dataframe which only contains data points that passed through PAR
-	"""
+    Returns
+    -----------
+    data: dataframe
+        Dataframe which only contains data points that passed through PAR
+    """
 
-	TCID_par = []
-	par_poly = geometry.Polygon([(120, 25), (135, 25), (135, 5), (115, 5), (115, 15), (120, 21), (120, 25)])
-	start_time = time.time()
+    TCID_par = []
+    par_poly = geometry.Polygon([(120, 25), (135, 25), (135, 5), (115, 5), (115, 15), (120, 21), (120, 25)])
+    start_time = time.time()
 
-	for TCID, val in data.groupby('TCID', sort=False):
-		trajectory = geometry.MultiPoint(val[['LONGITUDE', 'LATITUDE']].values)
-						
-		if trajectory.intersects(par_poly):
-			TCID_par.append(TCID)
-					
-	print("Run Time: %s seconds" % (time.time() - start_time))
+    for TCID, val in data.groupby('TCID', sort = False):
+        trajectory = geometry.MultiPoint(val[['LONGITUDE', 'LATITUDE']].values)
 
-	data = data.loc[data['TCID'].isin(TCID_par)].reset_index(drop=True)
+        if trajectory.intersects(par_poly):
+            TCID_par.append(TCID)
 
-	print('Successfully filtered data that passed through PAR \n')
+    print("Run Time: %s seconds" % (time.time() - start_time))
 
-	return data
+    data = data.loc[data['TCID'].isin(TCID_par)].reset_index(drop = True)
 
+    print('Successfully filtered data that passed through PAR \n')
+
+    return data
 
 
 def getPoints(data, mode):
-	""" Get points based on mode
+    """ Get points based on mode
 
-	Parameters
-	-----------
-	data: dataframe
-		The dataframe which contains the data
-	mode: str
-		Basis of point extraction (if ORIGIN/ENDPOINT)
+    Parameters
+    -----------
+    data: dataframe
+        The dataframe which contains the data
+    mode: str
+        Basis of point extraction (if ORIGIN/ENDPOINT)
 
-	Returns
-	-----------
-	data: dataframe
-		Dataframe which only contains points based on specified mode
-	"""
+    Returns
+    -----------
+    data: dataframe
+        Dataframe which only contains points based on specified mode
+    """
 
-	start_time = time.time()
-	TCID = data.TCID.unique()
-	if mode == 'ORIGIN':
-		data = data.drop(data[data['ADV'] != 1].index)
-	elif mode == 'ENDPOINT':
-		TCID_len = len(TCID) 
-		for TC in TCID:
-			duration = len(data.loc[data['TCID'] == TC])
-			endpoint_index = duration - 1
-			endpoint = data.iloc[[endpoint_index]]
-			data = data.drop(data[data['TCID'] == TC].index)
-			data = pd.concat([data, endpoint])
+    start_time = time.time()
+    TCID = data.TCID.unique()
+    if mode == 'ORIGIN':
+        data = data.drop(data[data['ADV'] != 1].index)
+    elif mode == 'ENDPOINT':
+        TCID_len = len(TCID)
+        for TC in TCID:
+            duration = len(data.loc[data['TCID'] == TC])
+            endpoint_index = duration - 1
+            endpoint = data.iloc[[endpoint_index]]
+            data = data.drop(data[data['TCID'] == TC].index)
+            data = pd.concat([data, endpoint])
 
-	print('Run Time: %s seconds' % (time.time() - start_time))
-	print('Successfully extracted', mode, 'points')
+    print('Run Time: %s seconds' % (time.time() - start_time))
+    print('Successfully extracted', mode, 'points')
 
-	return data
-
+    return data
 
 
 def normalize(data):
-	""" Normalizes latitude and longitude data points
+    """ Normalizes latitude and longitude data points
 
-	Parameters
-	-----------
-	data: dataframe
-		The dataframe which contains the data
+    Parameters
+    -----------
+    data: dataframe
+        The dataframe which contains the data
 
-	Returns
-	-----------
-	data: dataframe
-		Dataframe which contains NORMALIZED_LAT and NORMALIZED_LONG fields
-	"""
+    Returns
+    -----------
+    data: dataframe
+    Dataframe which contains NORMALIZED_LAT and NORMALIZED_LONG fields
+    """
 
-	TCIDs = data['TCID'].values
-	origin_array = data.loc[data['ADV'] == '1', ['LATITUDE', 'LONGITUDE']].values
-	
-	
-	origin_dict = dict(zip(TCIDs, origin_array))
+    TCIDs = data['TCID'].values
+    origin_array = data.loc[data['ADV'] == '1', ['LATITUDE', 'LONGITUDE']].values
 
-	for TCID, origin in origin_dict.items():
-		latitude = data.loc[data['TCID'] == TCID, 'LATITUDE'].values
-		longitude = data.loc[data['TCID'] == TCID, 'LONGITUDE'].values
-		
-		norm_lat = [np.round(lat-origin[0], 2) for lat in latitude]
-		norm_long = [np.round(lon - origin[1], 2) for lon in longitude]
+    origin_dict = dict(zip(TCIDs, origin_array))
 
-		data.loc[data['TCID'] == TCID, 'NORMALIZED_LATITUDE'] = norm_lat
-		data.loc[data['TCID'] == TCID, 'NORMALIZED_LONGITUDE'] = norm_long
-	
-	return data
+    for TCID, origin in origin_dict.items():
+        latitude = data.loc[data['TCID'] == TCID, 'LATITUDE'].values
+        longitude = data.loc[data['TCID'] == TCID, 'LONGITUDE'].values
 
-	
+        norm_lat = [np.round(lat - origin[0], 2) for lat in latitude]
+        norm_long = [np.round(lon - origin[1], 2) for lon in longitude]
+
+        data.loc[data['TCID'] == TCID, 'NORMALIZED_LATITUDE'] = norm_lat
+        data.loc[data['TCID'] == TCID, 'NORMALIZED_LONGITUDE'] = norm_long
+
+    return data
+
 
 def checkTimeConsistency(data):
-	""" Checks if time step follows 6-hr interval
+    """ Checks if time step follows 6-hr interval
 
-	Parameters
-	-----------
-	data: dataframe
-		The dataframe which contains the data
+    Parameters
+    -----------
+    data: dataframe
+        The dataframe which contains the data
 
-	Returns
-	-----------
-	"""
+    Returns
+    -----------
+    """
 
-	times = data['TIME'].values
-	times = [t.split('/')[2] for t in times]
-	times = [re.sub('[a-zA-z]$', '', t) for t in times]
+    times = data['TIME'].values
+    times = [t.split('/')[2] for t in times]
+    times = [re.sub('[a-zA-z]$', '', t) for t in times]
 
-	data.loc[:, 'TIME_INTERVAL'] = times
+    data.loc[:, 'TIME_INTERVAL'] = times
 
-	TCID = data['TCID'].unique()
-	counter = 0
-	print(len(data['TCID'].unique()))
+    TCID = data['TCID'].unique()
+    counter = 0
+    print(len(data['TCID'].unique()))
 
-	for TC in TCID:
-		time_interval = data.loc[data['TCID'] == TC, 'TIME_INTERVAL'].values
-		time_interval = time_interval.astype(float)
-		origin = time_interval[0]
-		temp = origin
-		
-		for t in time_interval:
-			flag = 0
-			if temp > 23.:
-				temp = 0.
-			if t != temp:
-				flag = 1
-				break
+    for TC in TCID:
+        time_interval = data.loc[data['TCID'] == TC, 'TIME_INTERVAL'].values
+        time_interval = time_interval.astype(float)
+        origin = time_interval[0]
+        temp = origin
 
-			temp = temp + 6
+        for t in time_interval:
+            flag = 0
+            if temp > 23.:
+                temp = 0.
+            if t != temp:
+                flag = 1
+                break
 
-		if flag == 1:
-			print(flag, TC)
-			data = data.drop(data[data['TCID'] == TC].index)
+            temp = temp + 6
 
+        if flag == 1:
+            print(flag, TC)
+            data = data.drop(data[data['TCID'] == TC].index)
 
-	data.to_csv('imported/Full_Dataset.csv', index=False)
+    data.to_csv('imported/Full_Dataset.csv', index = False)
+    return

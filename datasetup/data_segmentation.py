@@ -46,6 +46,18 @@ def kmeans(data, centroids):
 
 
 def hierarchicalClustering(data):
+    """ Performs Hierarchical Clustering clustering using MeanShift
+
+        Parameters
+        -----------
+        data: dataframe
+            The dataframe which contains the data
+
+        Returns
+        -----------
+        data: dataframe
+            Dataframe which contains Hierarchical Clustering  Labels (cluster label of each tropical cyclone)
+        """
     copy = data[['LATITUDE', 'LONGITUDE', 'TCID']].set_index('TCID')
     ms = MeanShift()
     ms.fit(copy)
@@ -55,6 +67,18 @@ def hierarchicalClustering(data):
 
 
 def DBSCANClustering(data):
+    """ Performs DBSCAN clustering
+
+        Parameters
+        -----------
+        data: dataframe
+            The dataframe which contains the data
+
+        Returns
+        -----------
+        data: dataframe
+            Dataframe which contains DBSCAN Labels (cluster label of each tropical cyclone)
+        """
     copy = data[['LATITUDE', 'LONGITUDE', 'TCID']].set_index('TCID')
     db = DBSCAN(eps = 0.3).fit(copy)
     labels = db.labels_
@@ -124,3 +148,4 @@ def elbowPlotAnalysis(data):
     plt.title('The Elbow Method showing the optimal Number of Centroids')
     plt.savefig('exported/plots/Elbow_Plot_Analysis_filter_ztransformed.png')
     plt.close()
+    return
