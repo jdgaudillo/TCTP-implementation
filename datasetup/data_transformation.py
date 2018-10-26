@@ -45,15 +45,13 @@ def PTEquivalence(data):
     return data
 
 
-def zTransform(data, bit):
+def zTransform(data):
     """ Transforms data into z-order value
 
     Parameters
     -----------
     data: dataframe
         The dataframe which contains the data
-    bit: int
-        The number of unique bit
 
     Returns
     -----------
