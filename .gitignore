@@ -58,7 +58,7 @@ Full_dataset.txt
 test_function.py
 imported/
 exported/
-__pycache__
+__pycache__/
 kNN.py
 .idea
 feature_reduction.py
