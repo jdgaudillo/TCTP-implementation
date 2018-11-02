@@ -62,3 +62,4 @@ __pycache__
 kNN.py
 .idea
 feature_reduction.py
+correspondence_analysis.py
