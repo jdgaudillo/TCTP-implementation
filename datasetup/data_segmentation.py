@@ -88,13 +88,19 @@ def DBSCANClustering(data):
     return data
 
 
-def silhouetteAnalysis(data):
+def silhouetteAnalysis(data, name, add):
     """ Performs silhouette analysis
 
     Parameters
     -----------
     data: dataframe
         The dataframe which contains the data
+
+    name: String
+        Name of the output plot
+
+    add: String
+        Name of additional filename
 
     Returns
     -----------
@@ -105,7 +111,7 @@ def silhouetteAnalysis(data):
     data = data[['LATITUDE', 'LONGITUDE']]
     data = data.values
     sil_list = []
-    k = range(2, 50)
+    k = range(2, 10)
 
     ncluster = []
     silhouetteavg = []
@@ -184,7 +190,7 @@ def silhouetteAnalysis(data):
                       "with n_clusters = %d" % n_cluster),
                      fontsize=14, fontweight='bold')
 
-        outfile = 'exported/sample' + str(n_cluster) + '.png'
+        outfile = 'exported/silhouette-plots/silhouette_analysis_distribution_' + str(n_cluster) + '_' + str(add)+'.png'
         plt.savefig(outfile)
         plt.close()
 
@@ -192,10 +198,10 @@ def silhouetteAnalysis(data):
     plt.plot(k, sil_list, 'bx-')
     plt.xlabel('Number of Centroids')
     plt.ylabel('Silhouette Score')
-    outfile = 'exported/Silhouette_Analysis_Plot_1/0.jpg'
-    plt.savefig('exported/plot.png')
+    plt.savefig('exported/silhouette-plots/' + str(name))
     plt.close()
     return
+
 
 def elbowPlotAnalysis(data):
     """ Performs elbow curve analysis
