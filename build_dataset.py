@@ -2,8 +2,8 @@ import warnings
 warnings.filterwarnings('ignore')
 
 from datasetup.utils import *
-from datasetup.data_preprocessing import filterPAR
-#from datasetup.data_segmentation import *
+from datasetup.data_preprocessing import filterPAR, getPoints
+from datasetup.data_segmentation import *
 
 data_file = 'exported/Cleaned_Dataset.csv'
 
@@ -15,12 +15,16 @@ data_file = 'exported/Cleaned_Dataset.csv'
 
 """
 
-filter_mode = input('Filter dataset? \n 0 NO \n 1 YES\n')
-point_mode = input('What data point to use? \n 0 ORIGIN \n 1 ENDPOINT \n')
-clustering_mode = input('What clustering method to use? \n 0 kMeans \n 1 Hierarchical Clustering \n 2 DBSCAN \n')
+#filter_mode = input('Filter dataset? \n 0 NO \n 1 YES\n')
+#point_mode = input('What data point to use? \n 0 ORIGIN \n 1 ENDPOINT \n')
+#clustering_mode = input('What clustering method to use? \n 0 kMeans \n 1 Hierarchical Clustering \n 2 DBSCAN \n')
 
 checkFileType(data_file)
 data = openFile(data_file)
+
+if filter_mode == 1:
+    filter_mode(data)
+    		
 
 if filter_mode == 1:
 	data = filterPAR(data)
@@ -30,7 +34,11 @@ if point_mode == 0:
 elif point_mode == 1:
 	data = getPoints(data, 'ENDPOINT')
 
-if clustering_mode == 0:
-	silhouette_analysis(data)
-
+for i in range(3):
+	if i == 0:
+		sillhouetteAnalysis(data)
+	elif i == 1:
+		hierarchicalClustering(data)
+	elif i == 3:
+		DBSCANClustering(data)
 
