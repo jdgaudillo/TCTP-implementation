@@ -6,6 +6,7 @@ from shapely import geometry
 import time
 
 from datasetup.utils import *
+import itertools
 
 
 def clean(filename):
@@ -96,6 +97,7 @@ def getPoints(data, mode):
 
     start_time = time.time()
     TCID = data.TCID.unique()
+
     if mode == 'ORIGIN':
         data = data.drop(data[data['ADV'] != 1].index)
     elif mode == 'ENDPOINT':
@@ -127,18 +129,28 @@ def normalize(data):
     Dataframe which contains NORMALIZED_LAT and NORMALIZED_LONG fields
     """
 
-    TCIDs = data['TCID'].values
-    origin_array = data.loc[data['ADV'] == '1', ['LATITUDE', 'LONGITUDE']].values
+    TCIDs = data['TCID'].unique()
+    origin_array = []
 
+    for TC in TCIDs:
+        temp = data.loc[(data['TCID'] == TC) & (data['ADV'] == 1), ['LATITUDE', 'LONGITUDE']].values
+        origin_array.append(temp)
+
+    #origin_array = data.loc[(data['TCID'] == TCIDs) & (data['ADV'] == 1), ['LATITUDE', 'LONGITUDE']].values
+    print(len(TCIDs), len(origin_array))
+    
     origin_dict = dict(zip(TCIDs, origin_array))
 
     for TCID, origin in origin_dict.items():
+        if origin.shape[0] == 0:
+            continue
+
         latitude = data.loc[data['TCID'] == TCID, 'LATITUDE'].values
         longitude = data.loc[data['TCID'] == TCID, 'LONGITUDE'].values
-
-        norm_lat = [np.round(lat - origin[0], 2) for lat in latitude]
-        norm_long = [np.round(lon - origin[1], 2) for lon in longitude]
-
+ 
+        norm_lat = [np.round(lat - origin[0,0], 2) for lat in latitude]
+        norm_long = [np.round(lon - origin[0,1], 2) for lon in longitude]
+ 
         data.loc[data['TCID'] == TCID, 'NORMALIZED_LATITUDE'] = norm_lat
         data.loc[data['TCID'] == TCID, 'NORMALIZED_LONGITUDE'] = norm_long
 
