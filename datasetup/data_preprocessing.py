@@ -126,14 +126,10 @@ def normalize(data):
     TCIDs = data['TCID'].unique()
     origin_array = []
 
-    for TC in TCIDs:
-        temp = data.loc[(data['TCID'] == TC) & (data['ADV'] == 1), ['LATITUDE', 'LONGITUDE']].values
-        origin_array.append(temp)
-
-    #origin_array = data.loc[(data['TCID'] == TCIDs) & (data['ADV'] == 1), ['LATITUDE', 'LONGITUDE']].values
-    print(len(TCIDs), len(origin_array))
+    origin_array = data.groupby(['TCID'], sort=False)['LATITUDE', 'LONGITUDE'].first().values
     
     origin_dict = dict(zip(TCIDs, origin_array))
+
 
     for TCID, origin in origin_dict.items():
         if origin.shape[0] == 0:
