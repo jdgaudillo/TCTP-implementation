@@ -110,19 +110,6 @@ def getPoints(data, mode):
 
 
 def normalize(data):
-    """ Normalizes latitude and longitude data points
-
-    Parameters
-    -----------
-    data: dataframe
-        The dataframe which contains the data
-
-    Returns
-    -----------
-    data: dataframe
-    Dataframe which contains NORMALIZED_LAT and NORMALIZED_LONG fields
-    """
-
     TCIDs = data['TCID'].unique()
     origin_array = []
 
@@ -130,19 +117,15 @@ def normalize(data):
     
     origin_dict = dict(zip(TCIDs, origin_array))
 
-
     for TCID, origin in origin_dict.items():
-        if origin.shape[0] == 0:
-            continue
-
         latitude = data.loc[data['TCID'] == TCID, 'LATITUDE'].values
         longitude = data.loc[data['TCID'] == TCID, 'LONGITUDE'].values
  
-        norm_lat = [np.round(lat - origin[0,0], 2) for lat in latitude]
-        norm_long = [np.round(lon - origin[0,1], 2) for lon in longitude]
+        norm_lat = [np.round(lat - origin[0], 2) for lat in latitude]
+        norm_long = [np.round(lon - origin[1], 2) for lon in longitude]
  
-        data.loc[data['TCID'] == TCID, 'NORMALIZED_LATITUDE'] = norm_lat
-        data.loc[data['TCID'] == TCID, 'NORMALIZED_LONGITUDE'] = norm_long
+        data.loc[data['TCID'] == TCID, 'NORM_LAT'] = norm_lat
+        data.loc[data['TCID'] == TCID, 'NORM_LONG'] = norm_long
 
     return data
 
