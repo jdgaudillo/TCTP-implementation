@@ -101,13 +101,7 @@ def getPoints(data, mode):
     if mode == 'ORIGIN':
         data = data.drop(data[data['ADV'] != 1].index)
     elif mode == 'ENDPOINT':
-        TCID_len = len(TCID)
-        for TC in TCID:
-            duration = len(data.loc[data['TCID'] == TC])
-            endpoint_index = duration - 1
-            endpoint = data.iloc[[endpoint_index]]
-            data = data.drop(data[data['TCID'] == TC].index)
-            data = pd.concat([data, endpoint])
+        data = data.groupby(['TCID'], sort=False).last()
 
     print('Run Time: %s seconds' % (time.time() - start_time))
     print('Successfully extracted', mode, 'points')
